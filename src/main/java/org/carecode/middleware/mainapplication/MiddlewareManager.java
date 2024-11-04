@@ -1,6 +1,11 @@
 package org.carecode.middleware.mainapplication;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  *
  * @author Dr M H B Ariyaratne <buddhika.ari@gmail.com>
@@ -54,20 +59,53 @@ public class MiddlewareManager {
 
     // Starts a specific middleware application by path and adds it to the list
     public void startProcess(String processPath) {
+        System.out.println("startProcess");
+        System.out.println("processPath = " + processPath);
         Process process = createProcess(processPath);
         if (process != null) {
             processes.add(process);
         }
     }
 
-    // Helper method to create a process from a given path
     private Process createProcess(String processPath) {
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder(processPath);
-            return processBuilder.start();
+            // Log the command to be executed
+            System.out.println("Attempting to start process: java -jar " + processPath);
+
+            // Create the process builder with "java -jar <path_to_jar>"
+            ProcessBuilder processBuilder = new ProcessBuilder("java", "-jar", processPath);
+
+            // Redirect error and output streams to the console for visibility
+            processBuilder.redirectErrorStream(true);
+
+            // Start the process and capture it
+            Process process = processBuilder.start();
+
+            // Log process info if started successfully
+            if (process.isAlive()) {
+                System.out.println("Process started successfully: " + processPath);
+            } else {
+                System.out.println("Process failed to start: " + processPath);
+            }
+
+            // Attach a new thread to read the output of the process
+            new Thread(() -> {
+                try (var reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println("Process Output: " + line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            return process;
         } catch (Exception e) {
-            Logger.getInstance().logError("Failed to start process at path: " + processPath);
+            System.out.println("Failed to start process at path: " + processPath);
+            e.printStackTrace();
             return null;
         }
     }
+
 }

@@ -1,8 +1,10 @@
 package org.carecode.middleware.mainapplication;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+
 /**
  *
  * @author Dr M H B Ariyaratne <buddhika.ari@gmail.com>
@@ -70,7 +72,8 @@ public class Settings {
     }
 
     public String[] getProcessPaths() {
-        return processPaths;
+        String paths = properties.getProperty("processPaths", "");
+        return paths.isEmpty() ? new String[0] : paths.split(",");
     }
 
     public void setProcessPaths(String[] processPaths) {
