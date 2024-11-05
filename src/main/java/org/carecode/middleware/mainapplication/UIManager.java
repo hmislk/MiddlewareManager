@@ -24,24 +24,22 @@ public class UIManager {
         this.middlewareManager = middlewareManager;
     }
 
-    // Initializes the main UI components
     public void initializeUI() {
         frame = new JFrame("Middleware Manager");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 400);
 
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayout(Settings.getInstance().getProcessPaths().length, 4));
+        mainPanel = new JPanel(new GridBagLayout()); // Use GridBagLayout
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // Add space around components
 
-        initializeComponents();
-        setActionListeners();
+        initializeComponents(gbc);
 
         frame.add(mainPanel);
         frame.setVisible(true);
     }
 
-    // Initializes the UI components (status labels and control buttons)
-    private void initializeComponents() {
+    private void initializeComponents(GridBagConstraints gbc) {
         int processCount = Settings.getInstance().getProcessPaths().length;
         processStatusLabels = new JLabel[processCount];
         startButtons = new JButton[processCount];
@@ -49,52 +47,57 @@ public class UIManager {
         restartButtons = new JButton[processCount];
 
         for (int i = 0; i < processCount; i++) {
-            processStatusLabels[i] = new JLabel("Status: UNKNOWN");
-            startButtons[i] = new JButton("Start");
-            stopButtons[i] = new JButton("Stop");
-            restartButtons[i] = new JButton("Restart");
-
             String fullPath = Settings.getInstance().getProcessPaths()[i];
-            String fileName = new File(fullPath).getName(); // Extracts only the filename from the path
-            mainPanel.add(new JLabel(fileName)); // Display the filename instead of "Middleware i"
+            String fileName = new File(fullPath).getName();
 
-            mainPanel.add(processStatusLabels[i]);
-            mainPanel.add(startButtons[i]);
-            mainPanel.add(stopButtons[i]);
-            mainPanel.add(restartButtons[i]);
+            gbc.gridx = 0;
+            gbc.gridy = i;
+            mainPanel.add(new JLabel(fileName), gbc);
+
+            processStatusLabels[i] = new JLabel("Status: UNKNOWN");
+            gbc.gridx = 1;
+            mainPanel.add(processStatusLabels[i], gbc);
+
+            startButtons[i] = new JButton("Start");
+            startButtons[i].setPreferredSize(new Dimension(80, 25));
+            gbc.gridx = 2;
+            mainPanel.add(startButtons[i], gbc);
+
+            stopButtons[i] = new JButton("Stop");
+            stopButtons[i].setPreferredSize(new Dimension(80, 25));
+            gbc.gridx = 3;
+            mainPanel.add(stopButtons[i], gbc);
+
+            restartButtons[i] = new JButton("Restart");
+            restartButtons[i].setPreferredSize(new Dimension(80, 25));
+            gbc.gridx = 4;
+            mainPanel.add(restartButtons[i], gbc);
+
+            // Setting action listeners for each button
+            final int index = i; // to reference the correct process in listeners
+            startButtons[i].addActionListener(e -> {
+                String processPath = Settings.getInstance().getProcessPaths()[index];
+                middlewareManager.startProcess(processPath);
+                updateStatusDisplay(index, MiddlewareStatus.RUNNING);
+            });
+
+            stopButtons[i].addActionListener(e -> {
+                middlewareManager.stopAllProcesses(); // Change this if you only want to stop the specific process
+                updateStatusDisplay(index, MiddlewareStatus.STOPPED);
+            });
+
+            restartButtons[i].addActionListener(e -> {
+                middlewareManager.restartProcess(index);
+                updateStatusDisplay(index, MiddlewareStatus.RUNNING);
+            });
         }
     }
 
-    // Sets action listeners for each button
     private void setActionListeners() {
-        for (int i = 0; i < startButtons.length; i++) {
-            final int index = i;
-
-            startButtons[i].addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    middlewareManager.startProcess(Settings.getInstance().getProcessPaths()[index]);
-                    updateStatusDisplay(index, MiddlewareStatus.RUNNING);
-                }
-            });
-
-            stopButtons[i].addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    middlewareManager.stopAllProcesses(); // or use specific process stop if needed
-                    updateStatusDisplay(index, MiddlewareStatus.STOPPED);
-                }
-            });
-
-            restartButtons[i].addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    middlewareManager.restartProcess(index);
-                    updateStatusDisplay(index, MiddlewareStatus.RUNNING);
-                }
-            });
-        }
+        // Set up action listeners as before (not shown here for brevity)
     }
 
-    // Updates the status label of a specific middleware process
     public void updateStatusDisplay(int processIndex, MiddlewareStatus status) {
-        processStatusLabels[processIndex].setText("Status : " + status.name());
+        processStatusLabels[processIndex].setText("Status: " + status.name());
     }
 }
