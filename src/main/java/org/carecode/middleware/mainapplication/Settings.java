@@ -17,7 +17,7 @@ public class Settings {
     private boolean autoStart;
     private String[] processPaths;
 
-    private static final String CONFIG_FILE = "config.properties";
+    private static final String CONFIG_FILE = "D:\\ccmw\\settings\\mm\\config.properties";
 
     // Private constructor to enforce singleton pattern
     private Settings() {

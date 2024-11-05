@@ -91,6 +91,6 @@ public class UIManager {
 
     // Updates the status label of a specific middleware process
     public void updateStatusDisplay(int processIndex, MiddlewareStatus status) {
-        processStatusLabels[processIndex].setText("Status: " + status.name());
+        processStatusLabels[processIndex].setText("Status : " + status.name());
     }
 }
