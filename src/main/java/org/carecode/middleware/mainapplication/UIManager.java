@@ -1,9 +1,10 @@
 package org.carecode.middleware.mainapplication;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.io.File;
 
 /**
  *
@@ -53,7 +54,10 @@ public class UIManager {
             stopButtons[i] = new JButton("Stop");
             restartButtons[i] = new JButton("Restart");
 
-            mainPanel.add(new JLabel("Middleware " + (i + 1)));
+            String fullPath = Settings.getInstance().getProcessPaths()[i];
+            String fileName = new File(fullPath).getName(); // Extracts only the filename from the path
+            mainPanel.add(new JLabel(fileName)); // Display the filename instead of "Middleware i"
+
             mainPanel.add(processStatusLabels[i]);
             mainPanel.add(startButtons[i]);
             mainPanel.add(stopButtons[i]);
