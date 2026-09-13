@@ -38,4 +38,4 @@ Special thanks to OpenAI's ChatGPT for technical assistance in drafting the foun
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License (AGPL)**. For more details, see the `LICENSE.md` file in the repository.
+This project is licensed under the **GNU Affero General Public License (AGPL)**. For more details, see the `LICENSE` file in the repository.
